@@ -4,7 +4,7 @@ import sys
 
 # Getting to the Lambda directory
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
-from src.khang_modules.crawler import lambda_handler
+from project.crawler import lambda_handler
 from tests.common.utils import get_event_input_by_path
 
 
