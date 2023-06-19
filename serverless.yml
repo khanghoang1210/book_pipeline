@@ -1,0 +1,61 @@
+service: ai4e-lambda
+
+frameworkVersion: "3"
+
+package:
+  exclude:
+    - node_modules/**
+    - README.md
+    - package.json
+    - package-lock.json
+    - buildspec.yaml
+    - bitbucket-pipelines.yml
+
+plugins:
+  - serverless-python-requirements
+  - serverless-deployment-bucket
+
+custom:
+  basePath: src
+  region: ap-southeast-1
+  prefix: lbd-func
+  pythonRequirements:
+    layer: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: ap-southeast-1
+  memorySize: 128
+  deploymentBucket:
+    name: ${env:LAMBDA_DEPLOYMENT_BUCKET_NAME}
+    maxPreviousDeploymentArtifacts: 10
+    blockPublicAccess: true
+    skipPolicySetup: true
+    versioning: true
+    serverSideEncryption: AES256
+
+functions:
+  ai4e_crawler:
+    name: ${self:custom.prefix}-ai4e_crawler
+    handler: src.ai4e_crawler.crawler.lambda_handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+
+  ai4e_rds2raw_movie:
+    name: ${self:custom.prefix}-ai4e_rds2raw_movie
+    handler: src.ai4e_crawler.rds2raw_movie.lambda_handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+
+  book_crawler:
+    name: ${self:custom.prefix}-book_crawler
+    handler: src.khang_modules.crawler.lambda_handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
+
+  khang_rds2raw_book:
+    name: ${self:custom.prefix}-khang_rds2raw_book
+    handler: src.khang_modules.rds2raw_book.lambda_handler
+    layers:
+      - Ref: PythonRequirementsLambdaLayer
